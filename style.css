@@ -1,0 +1,233 @@
+body {
+    /* Fundo principal escuro (quase preto) - Padrão DARK */
+    font-family: 'Arial', sans-serif;
+    background-color: #121212; 
+    margin: 0;
+    padding: 0;
+    /* Cor do texto principal (branco suave) */
+    color: #E0E0E0; 
+    transition: background-color 0.3s, color 0.3s; /* Transição suave para mudança de tema */
+}
+
+/* --- Navbar Style (Tema Escuro) --- */
+.navbar {
+    background-color: #1E1E1E; 
+    padding: 15px 30px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+    display: flex;
+    align-items: center;
+    justify-content: space-between; 
+    margin-bottom: 20px;
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+/* Estilo para a Logo (IMAGEM) */
+.logo-container img {
+    height: 55px; /* Altura definida no HTML, mas garantida aqui */
+    width: auto;
+    margin-right: 10px;
+    /* Opcional: filtro para garantir que a imagem fique visível em temas claros/escuros */
+    /* filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.3)); */ 
+    transition: filter 0.3s ease;
+}
+
+.site-name {
+    font-size: 1.5em;
+    font-weight: bold;
+    color: #E0E0E0; 
+}
+
+/* --- Theme Toggle Button --- */
+.theme-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 0; 
+}
+.theme-toggle ion-icon {
+    font-size: 1.6em;
+    color: #FFCC80; /* Cor da lua no modo escuro */
+    transition: color 0.3s ease;
+}
+.theme-toggle:hover ion-icon {
+    color: #FFB74D;
+}
+
+.container {
+    max-width: 800px;
+    margin: 0 auto;
+    background: #1E1E1E; 
+    padding: 30px;
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.5); 
+    border-radius: 12px;
+    margin-top: 20px; 
+    transition: background 0.3s, box-shadow 0.3s;
+}
+
+h1, h2 {
+    color: #80CBC4; 
+    border-bottom: 2px solid #303030;
+    padding-bottom: 10px;
+    transition: color 0.3s, border-color 0.3s;
+}
+.container h1 {
+    font-size: 1.8em;
+    margin-top: 0;
+}
+
+/* --- Estilo do Formulário (Tema Escuro) --- */
+#form-container {
+    margin-bottom: 30px;
+    padding: 20px;
+    border: 1px solid #303030;
+    border-radius: 8px;
+    background: #252525;
+    transition: background 0.3s, border 0.3s;
+}
+
+#product-form input[type="text"],
+#product-form input[type="number"] {
+    width: 100%;
+    padding: 12px;
+    margin-bottom: 10px;
+    background-color: #333333; 
+    border: 1px solid #444444;
+    border-radius: 6px;
+    box-sizing: border-box;
+    color: #E0E0E0;
+    transition: background-color 0.3s, border-color 0.3s, color 0.3s;
+}
+
+#product-form input:focus {
+    border-color: #80CBC4; 
+    outline: none;
+}
+
+/* Botões - Cores fixas */
+#product-form button {
+    padding: 10px 15px;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-right: 10px;
+    transition: background-color 0.3s ease;
+    color: #1E1E1E; 
+}
+#submit-button { background-color: #80CBC4; }
+#submit-button:hover { background-color: #4DB6AC; }
+#cancel-edit { background-color: #FFCC80; }
+#cancel-edit:hover { background-color: #FFB74D; }
+
+/* --- Estilo da Lista de Produtos (Tema Escuro) --- */
+#products-list {
+    /* Remove a bolinha do lado do produto */
+    list-style-type: none; 
+    padding: 0;
+}
+
+#products-list li {
+    background: #292929; 
+    border: 1px solid #303030;
+    border-radius: 8px;
+    padding: 20px;
+    margin-bottom: 15px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+    transition: background 0.3s, border 0.3s, box-shadow 0.3s;
+}
+
+#products-list li h3 {
+    color: #80CBC4; 
+    margin-bottom: 10px;
+}
+
+.price {
+    font-size: 1.1em;
+    font-weight: bold;
+    color: #C5E1A5; /* Verde claro para destacar valor */
+}
+
+.actions button:first-child { background-color: #C5E1A5; } 
+.delete-btn { background-color: #FF8A80; } 
+
+
+/* ================================================= */
+/* SOBRESCRIÇÕES PARA TEMA CLARO         */
+/* ================================================= */
+
+body.light-mode {
+    background-color: #F0F0F0; 
+    color: #121212; 
+}
+
+/* Navbar em Tema Claro */
+body.light-mode .navbar {
+    background-color: #FFFFFF;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+body.light-mode .site-name {
+    color: #121212;
+}
+
+/* Logo (IMAGEM) em Tema Claro - Adiciona sombra ou filtro se necessário para visibilidade */
+/* Se sua logo for escura, pode-se inverter a cor dela com um filtro para o tema claro */
+/* body.light-mode .logo-container img {
+    filter: invert(0); 
+} */
+
+
+/* Tema Toggle (Sol) em Tema Claro */
+body.light-mode .theme-toggle ion-icon {
+    color: #F9A825; /* Cor do Sol (Amarelo) */
+}
+body.light-mode .theme-toggle:hover ion-icon {
+    color: #FBC02D;
+}
+
+/* Container em Tema Claro */
+body.light-mode .container {
+    background: #FFFFFF; 
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); 
+}
+
+/* Títulos em Tema Claro */
+body.light-mode h1, body.light-mode h2 {
+    color: #00897B; 
+    border-bottom: 2px solid #E0E0E0;
+}
+
+/* Formulário em Tema Claro */
+body.light-mode #form-container {
+    border: 1px solid #CCCCCC;
+    background: #F8F8F8;
+}
+
+/* Input Fields em Tema Claro */
+body.light-mode #product-form input[type="text"],
+body.light-mode #product-form input[type="number"] {
+    background-color: #FFFFFF; 
+    border: 1px solid #AAAAAA;
+    color: #121212;
+}
+body.light-mode #product-form input:focus {
+    border-color: #00897B; 
+}
+
+/* Lista de Produtos em Tema Claro */
+body.light-mode #products-list li {
+    background: #FFFFFF; 
+    border: 1px solid #E0E0E0;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+body.light-mode #products-list li h3 {
+    color: #00897B; 
+}
+
+body.light-mode .price {
+    color: #558B2F; 
+}

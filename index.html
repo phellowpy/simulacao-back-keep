@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>KeepInventory | Produtos de Mercado</title>
+    <link rel="stylesheet" href="/style.css">
+    
+    <script type="module" src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.esm.js"></script>
+    <script nomodule src="https://unpkg.com/ionicons@7.1.0/dist/ionicons/ionicons.js"></script>
+</head>
+<body>
+    <header class="navbar">
+        <div class="logo-container">
+            <img src="logo.png" alt="Logo KeepInventory" width="55">
+            <span class="site-name">KeepInventory</span>
+        </div>
+        <button id="theme-toggle" class="theme-toggle">
+            <ion-icon name="moon" id="theme-icon"></ion-icon> 
+        </button> 
+    </header>
+
+    <div class="container">
+        <h1>Registros do Inventário</h1>
+
+        <div id="form-container">
+            <h2>Registrar Novo Produto</h2>
+            <form id="product-form">
+                <input type="hidden" id="product-id">
+                
+                <input 
+                    type="text" 
+                    id="nome_produto" 
+                    placeholder="Nome do Produto" 
+                    required 
+                    maxlength="100"
+                    pattern="^[a-zA-Z0-9áàâãéèêíïóôõúüçÁÀÂÃÉÈÊÍÏÓÔÕÚÜÇ\s]+$"
+                    title="Apenas letras, números e espaços são permitidos."
+                >
+                
+                <input 
+                    type="text" 
+                    id="marca" 
+                    placeholder="Marca" 
+                    required 
+                    maxlength="50"
+                    pattern="^[a-zA-Z0-9áàâãéèêíïóôõúüçÁÀÂÃÉÈÊÍÏÓÔÕÚÜÇ\s]+$"
+                    title="Apenas letras, números e espaços são permitidos."
+                >
+                
+                <input 
+                    type="text" 
+                    id="categoria" 
+                    placeholder="Categoria" 
+                    required 
+                    maxlength="50"
+                    pattern="^[a-zA-Z0-9áàâãéèêíïóôõúüçÁÀÂÃÉÈÊÍÏÓÔÕÚÜÇ\s]+$"
+                    title="Apenas letras, números e espaços são permitidos."
+                >
+                
+                <input 
+                    type="text" 
+                    id="prateleira" 
+                    placeholder="Prateleira/Corredor" 
+                    required 
+                    maxlength="20"
+                    pattern="^[a-zA-Z0-9áàâãéèêíïóôõúüçÁÀÂÃÉÈÊÍÏÓÔÕÚÜÇ\s]+$"
+                    title="Apenas letras, números e espaços são permitidos."
+                >
+                
+                <input 
+                    type="number" 
+                    id="preco" 
+                    placeholder="Preço" 
+                    required 
+                    step="0.01" 
+                    min="0.01"
+                    title="Preço deve ser um valor positivo."
+                >
+                
+                <button type="submit" id="submit-button">Registrar Produto</button>
+                <button type="button" id="cancel-edit" style="display:none;">Cancelar Edição</button>
+            </form>
+        </div>
+
+        <div id="products-list-container">
+            <h2>Produtos em Inventário</h2>
+            <p id="loading-message">Carregando produtos...</p>
+            <ul id="products-list">
+                </ul>
+        </div>
+    </div>
+
+    <script>
+        // TODO Configuração da URL da API
+        const API_URL_BASE = 'http://127.0.0.1:5000/'; 
+        const LIGHT_MODE_CLASS = 'light-mode';
+
+        // --- Lógica de Tema ---
+        const themeToggle = document.getElementById('theme-toggle');
+        const themeIcon = document.getElementById('theme-icon');
+        const body = document.body;
+
+        function applyTheme(isLight) {
+            if (isLight) {
+                body.classList.add(LIGHT_MODE_CLASS);
+                // TODO Mudar o ícone para o Sol no modo Claro
+                themeIcon.setAttribute('name', 'sunny'); 
+                localStorage.setItem('theme', 'light');
+            } else {
+                body.classList.remove(LIGHT_MODE_CLASS);
+                // TODO Mudar o ícone para a Lua no modo Escuro
+                themeIcon.setAttribute('name', 'moon'); 
+                localStorage.setItem('theme', 'dark');
+            }
+        }
+
+        function loadTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            applyTheme(savedTheme === 'light');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            const isLight = body.classList.contains(LIGHT_MODE_CLASS);
+            applyTheme(!isLight);
+        });
+
+        // --- Lógica da Aplicação (CRUD) ---
+
+        // TODO CORREÇÃO: Função robusta para lidar com a resposta da API (JSON ou Erro)
+        async function handleResponse(response) {
+            if (response.ok) {
+                // Sucesso: Retorna o JSON. Se a resposta for 204 (No Content) retorna objeto vazio.
+                return response.status !== 204 ? await response.json() : {};
+            } else {
+                // Erro: Tenta ler o JSON com a mensagem de erro do backend.
+                let errorText;
+                try {
+                    const errorData = await response.json();
+                    errorText = errorData.erro || `Erro HTTP ${response.status} (${response.statusText})`;
+                } catch (e) {
+                    // Falha ao ler JSON (recebeu HTML ou texto simples - O motivo do erro 'Unexpected token' antes)
+                    console.error("Resposta do servidor inesperada (HTML/Texto):", await response.text());
+                    errorText = `Erro HTTP ${response.status}. Verifique se o servidor Flask está rodando corretamente.`;
+                }
+                throw new Error(errorText);
+            }
+        }
+
+        async function getProducts() {
+            try {
+                const response = await fetch(API_URL_BASE + 'get_products');
+                // TODO Usa handleResponse para garantir que a resposta seja JSON (ou lança erro)
+                const products = await handleResponse(response);
+                return products;
+            } catch (error) {
+                console.error("Erro ao carregar produtos:", error);
+                // TODO Mensagem de erro mais clara para o usuário
+                document.getElementById('products-list').innerHTML = `<li>Erro ao carregar produtos: ${error.message}</li>`;
+                return [];
+            }
+        }
+
+        async function saveProduct(product) {
+            const isEditing = !!product.id; 
+            const url = isEditing ? `${API_URL_BASE}edit_product/${product.id}` : `${API_URL_BASE}create_product`;
+            const method = isEditing ? 'PUT' : 'POST';
+            
+            // TODO O backend espera o preço com ponto (.), então fazemos a substituição aqui.
+            const payload = {
+                nome_produto: product.nome_produto,
+                marca: product.marca,
+                categoria: product.categoria,
+                prateleira: product.prateleira,
+                preco: product.preco.replace(',', '.') 
+            };
+
+            try {
+                const response = await fetch(url, {
+                    method: method,
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                // TODO Usa handleResponse para verificar a resposta e tratar erros
+                await handleResponse(response); 
+                
+                alert(`Produto ${isEditing ? 'editado' : 'registrado'} com sucesso!`);
+                loadProducts(); 
+            } catch (error) {
+                alert(`Falha ao salvar o produto: ${error.message}`);
+            }
+        }
+
+        async function deleteProduct(productId) {
+            if (!confirm("Tem certeza que deseja deletar este produto?")) return;
+
+            try {
+                const response = await fetch(`${API_URL_BASE}delete_product/${productId}`, {
+                    method: 'DELETE'
+                });
+
+                // TODO Usa handleResponse para verificar a resposta e tratar erros
+                await handleResponse(response);
+
+                alert("Produto deletado com sucesso!");
+                loadProducts(); 
+            } catch (error) {
+                alert(`Falha ao deletar o produto: ${error.message}`);
+            }
+        }
+
+        function startEdit(product) {
+            document.getElementById('product-id').value = product.id;
+            document.getElementById('nome_produto').value = product.nome_produto;
+            document.getElementById('marca').value = product.marca; 
+            document.getElementById('categoria').value = product.categoria;
+            document.getElementById('prateleira').value = product.prateleira;
+            // TODO: Garante que o preço seja exibido no input no formato correto (ponto decimal)
+            document.getElementById('preco').value = parseFloat(product.preco.replace(',', '.')).toFixed(2); 
+            
+            document.getElementById('submit-button').textContent = 'Salvar Alterações';
+            document.getElementById('cancel-edit').style.display = 'inline-block';
+            document.querySelector('#form-container h2').textContent = 'Editar Produto';
+        }
+
+        function cancelEdit() {
+            document.getElementById('product-form').reset();
+            document.getElementById('product-id').value = '';
+            
+            document.getElementById('submit-button').textContent = 'Registrar Produto';
+            document.getElementById('cancel-edit').style.display = 'none';
+            document.querySelector('#form-container h2').textContent = 'Registrar Novo Produto';
+        }
+
+        function displayProducts(products) {
+            const list = document.getElementById('products-list');
+            list.innerHTML = '';
+            document.getElementById('loading-message').style.display = 'none';
+
+            if (products.length === 0) {
+                list.innerHTML = '<li>Nenhum produto registrado. Adicione um!</li>';
+                return;
+            }
+
+            products.forEach(product => {
+                const li = document.createElement('li');
+                // TODO Formata o preço para R$ X,XX e a data para o formato local
+                const precoFormatado = product.preco ? `R$ ${product.preco.replace('.', ',')}` : 'R$ 0,00';
+                const dataFormatada = new Date(product.timestamp * 1000).toLocaleString('pt-BR');
+
+                // TODO Passa o objeto completo para startEdit para preencher todos os campos
+                const productJson = JSON.stringify(product).replace(/"/g, '&quot;');
+                
+                li.innerHTML = `
+                    <h3>${product.nome_produto}</h3>
+                    <p><strong>Marca:</strong> ${product.marca}</p>
+                    <p><strong>Categoria:</strong> ${product.categoria}</p>
+                    <p><strong>Prateleira:</strong> ${product.prateleira}</p>
+                    <p class="price"><strong>Preço:</strong> ${precoFormatado}</p>
+                    <small>Última Atualização: ${dataFormatada}</small>
+                    <div class="actions">
+                        <button onclick='startEdit(${productJson})'>Editar</button>
+                        <button class="delete-btn" onclick="deleteProduct('${product.id}')">Deletar</button>
+                    </div>
+                `;
+                list.appendChild(li);
+            });
+        }
+
+        async function loadProducts() {
+            document.getElementById('loading-message').style.display = 'block';
+            const products = await getProducts();
+            displayProducts(products);
+            cancelEdit(); 
+        }
+
+        document.getElementById('product-form').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const productId = document.getElementById('product-id').value;
+            const nome_produto = document.getElementById('nome_produto').value;
+            const marca = document.getElementById('marca').value;
+            const categoria = document.getElementById('categoria').value;
+            const prateleira = document.getElementById('prateleira').value;
+            const preco = document.getElementById('preco').value;
+
+
+            const productData = { 
+                id: productId,
+                nome_produto: nome_produto, 
+                marca: marca, 
+                categoria: categoria,
+                prateleira: prateleira,
+                preco: preco
+            };
+            
+            await saveProduct(productData);
+        });
+
+        document.getElementById('cancel-edit').addEventListener('click', cancelEdit);
+
+        window.onload = function() {
+            loadTheme();
+            loadProducts();
+        };
+    </script>
+</body>
+</html>
