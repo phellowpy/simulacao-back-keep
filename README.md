@@ -8,7 +8,6 @@ Uma aplicação web simples e robusta para gerenciamento de inventário, focada 
 
 - ✅ Cadastro de Produtos: **Nome, Marca, Categoria, Prateleira e Preço**.
 - 🛡️ **Filtro Agressivo de Conteúdo:** Recusa palavras ofensivas nos campos de texto.
-- 🚫 **Validação de Nome:** Permite no máximo duas palavras no campo "Nome do Produto" (Nome e Sobrenome) e impede palavras repetidas seguidas (ex: "Água Água").
 - ✍️ **Edição** completa de registros.
 - 🗑️ **Exclusão** de produtos do inventário.
 - 💾 Todos os dados são persistidos em tempo real no **Firebase Realtime Database**.
